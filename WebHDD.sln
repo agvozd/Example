@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebHDDApi", "WebHDDApi\WebHDDApi.csproj", "{5CAE3064-E508-4953-8150-DCB73592B563}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebHDD", "WebHDD\WebHDD.csproj", "{64A6AC01-9F63-4E75-BCD6-149D1301A20B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CAE3064-E508-4953-8150-DCB73592B563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CAE3064-E508-4953-8150-DCB73592B563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CAE3064-E508-4953-8150-DCB73592B563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CAE3064-E508-4953-8150-DCB73592B563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64A6AC01-9F63-4E75-BCD6-149D1301A20B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64A6AC01-9F63-4E75-BCD6-149D1301A20B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64A6AC01-9F63-4E75-BCD6-149D1301A20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64A6AC01-9F63-4E75-BCD6-149D1301A20B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

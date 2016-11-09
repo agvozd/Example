@@ -1,0 +1,186 @@
+﻿<head>
+    <title>Web HDD</title>
+    <script src="scripts/angular.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="scripts/angular-route.min.js"></script>
+   
+    <script src="scripts/spin.js"></script>
+    <script src="scripts/angular-spinner.js"></script>
+   
+	<meta charset="utf-8" />
+</head>
+
+<style>
+    table, td{
+        border: 1px solid lightgray;
+        border-collapse: collapse;
+        padding: 5px 20px 5px 20px;
+        text-align:center;
+
+    }
+    th{
+        
+        padding:5px 20px 5px 20px;
+        color:white;
+    }
+   ul {
+        list-style-type:none; 
+        color:cornflowerblue;
+        display:compact;     
+        margin:0px;
+        padding:0px;     
+    }
+   p span{margin-bottom:0px;
+          margin-top:0px;
+   }
+    p span:hover { background:#F8F7F7; }
+    li span:hover { background:#F8F7F7; }
+    
+</style>
+
+<body ng-app="WebHDD_App">
+    <form name="infoForm" ng-controller="HddApiController" >
+        <span us-spinner="{radius:15, width:4, length: 8, top:30, scale:0.4, left:190}" spinner-key="spinner-1" spinner-start-active="true"></span>
+        <table style="border-collapse:collapse">
+            <tr style="background-color:lightgray">
+                <th>Less 10Mb</th>
+                <th>10Mb - 50Mb</th>
+                <th>More 100Mb</th>
+            </tr>           
+            <tr>
+                <td>{{small_size_count}}</td>
+                <td>{{medium_size_count}}</td>
+                <td>{{large_size_count}}</td>
+            </tr>
+        </table>
+
+        <p style="margin-bottom:0px" ng-show="rootDirectory">Current directory: {{rootDirectory}}</p>
+        <p ng-show="perent || rootdirectory" style="margin-bottom:0px" ng-click="getPerent(perent)">  <span style="font-size:larger; padding-bottom:0px; margin-bottom:0px; color:cornflowerblue" >..</span></p>
+        <ul style="list-style-position:outside">            
+            <li ng-repeat="file in files_list track by $index" ng-init="fileInfo={path : file.FilePath, type : file._FileType}" ng-click="getDriInfo(fileInfo)" >
+               <span>{{file.Name}}</span> 
+            </li>
+        </ul>
+
+    </form>
+   
+    <script>
+        var app = angular.module('WebHDD_App', ['angularSpinner']);
+
+        app.controller('HddApiController', function ($scope, usSpinnerService) {        
+        $scope.apiRequest = null;
+        $scope.small_size_count = 0;
+        $scope.medium_size_count = 0;
+        $scope.large_size_count = 0;
+
+        usSpinnerService.spin('spinner-1');
+        $.ajax({
+            url: 'http://localhost:58184/api/Files',
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                setViewFilesData(result, $scope);
+                usSpinnerService.stop('spinner-1');
+            }
+        });               
+          
+        $scope.getDriInfo = function (fileInfo) {
+            if (fileInfo.type != 1) {
+                $scope.files_list = [];
+                $scope.rootDirectory = fileInfo.path;
+
+                usSpinnerService.spin('spinner-1');
+                $.ajax({
+                    url: 'http://localhost:58184/api/Files',
+                    contentType: "application/json; charset=utf-8",
+                    data: { 'path': fileInfo.path },
+                    success: function (result) {
+                        setViewFilesData(result, $scope);
+                        getCountProperty(fileInfo.path, $scope)
+                    }
+                });               
+            }           
+        }
+
+        $scope.getPerent = function(perent)
+        {
+            $scope.files_list = [];
+            $scope.small_size_count = 0;
+            $scope.medium_size_count = 0;
+            $scope.large_size_count = 0;
+
+            if (perent == $scope.rootDirectory)
+            {
+                usSpinnerService.spin('spinner-1');
+                $.ajax({
+                    url: 'http://localhost:58184/api/Files',
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        setViewFilesData(result, $scope);
+                        $scope.perent = "";
+                        $scope.rootDirectory = "";
+                        $scope.$apply();
+                        usSpinnerService.stop('spinner-1');
+                    }
+                });
+
+            }
+            else
+            {                
+                $scope.rootDirectory = perent;
+                $.ajax({
+                    url: 'http://localhost:58184/api/Files',
+                    contentType: "application/json; charset=utf-8",
+                    data: { 'path': perent },
+                    success: function (result) {
+                        setViewFilesData(result, $scope);
+                        getCountProperty(perent, $scope)
+                    }
+                });
+            }            
+        }
+
+
+        function getCountProperty(path, $scope) {
+            usSpinnerService.spin('spinner-1');
+           
+            if ($scope.apiRequest != null)
+            {
+                $scope.apiRequest.abort();
+            }
+            $scope.apiRequest = $.ajax({
+                url: 'http://localhost:58184/api/CountsBySize',
+                contentType: "application/json; charset=utf-8",
+                data: { 'path': path },
+                success: function (result) {
+                    setViewCountData(result, $scope); $scope.apiRequest = null;
+                    usSpinnerService.stop('spinner-1');
+                }
+            });
+        }
+
+        function setViewCountData(result, $scope)
+        {
+            $scope.small_size_count = result.Sfiles_size_count;
+            $scope.medium_size_count = result.Mfiles_size_count;
+            $scope.large_size_count = result.Lfiles_size_count;
+
+            $scope.$apply();
+        }
+
+        function setViewFilesData(result, $scope) {
+            $scope.files_list = angular.copy(result.FilesArray);
+           
+            if (result.Perent) {
+                $scope.perent = result.Perent;
+            }
+            else {
+                $scope.perent = $scope.rootDirectory;
+            }
+
+            $scope.$apply();
+        }
+    })
+    
+    </script>
+</body>
+
